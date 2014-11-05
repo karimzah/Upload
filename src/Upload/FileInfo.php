@@ -141,7 +141,7 @@ class FileInfo extends \SplFileInfo implements \Upload\FileInfoInterface
      */
     public function getMimetype()
     {
-        if (isset($this->mimetype) === false) {
+        if (isset($this->mimetype) === false && file_exists($this->getPathname()) ) {
             $finfo = new \finfo(FILEINFO_MIME);
             $mimetype = $finfo->file($this->getPathname());
             $mimetypeParts = preg_split('/\s*[;,]\s*/', $mimetype);
@@ -159,7 +159,7 @@ class FileInfo extends \SplFileInfo implements \Upload\FileInfoInterface
      */
     public function getMd5()
     {
-        return md5_file($this->getPathname());
+        return file_exists($this->getPathname()) ? md5_file($this->getPathname()) : null;
     }
 
     /**
@@ -169,7 +169,9 @@ class FileInfo extends \SplFileInfo implements \Upload\FileInfoInterface
      */
     public function getDimensions()
     {
-        list($width, $height) = getimagesize($this->getPathname());
+        $width = $height = 0;
+        if(file_exists($this->getPathname()))
+            list($width, $height) = getimagesize($this->getPathname());
 
         return array(
             'width' => $width,
